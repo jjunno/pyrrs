@@ -6,12 +6,14 @@ class FeedItem:
     self.origin_category = None
     self.origin_description = None
     self.origin_link = None
+    self.origin_image = None
     
     self.get_id()
     self.get_title()
     self.get_category()
     self.get_description()
     self.get_link()
+    self.get_image()
 
   def get_id(self):
     if 'id' in self.post:
@@ -39,3 +41,8 @@ class FeedItem:
     if 'link' in self.post:
       self.origin_link = self.post['link']
     print(f"Link: {self.origin_link}")
+    
+  def get_image(self):
+    if 'enclosure' in self.post:
+      self.origin_image = self.post['enclosure']
+    print(f"Image: {self.origin_image}")
