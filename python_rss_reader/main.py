@@ -5,7 +5,9 @@ import os
 import reader
 import feed_item
 
+# Either .env for development or .env_yle (host, .env in container)
 load_dotenv()
+
 MAIN_INTERVAL_SECONDS = int(os.getenv('MAIN_INTERVAL_SECONDS'))
 FEED_URL = os.getenv('FEED_URL')
 
@@ -26,23 +28,21 @@ def main():
   # .env should be fine
   #
   
+  # Read the feed
   feed = reader.Reader(FEED_URL)
   feed.read()
   
   if feed.feed is None:
     print("No feed found.")
     return None
-  print(feed.feed['title'])
   for post in feed.entries:
-    # print(post['title'])
     item = feed_item.FeedItem(feed.feed.title, post)
     item.post_to_inner_rest()
     # print(post.keys())
   return None
 
 if __name__ == "__main__":
-  # main()
-  # return None
-  while True:
-    main()
-    time.sleep(MAIN_INTERVAL_SECONDS)
+  main()
+  # while True:
+  #   main()
+  #   time.sleep(MAIN_INTERVAL_SECONDS)

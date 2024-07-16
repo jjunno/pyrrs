@@ -1,8 +1,4 @@
-// Update with your config settings.
 import dotenv from 'dotenv';
-
-// Use path when developing. Otherwise use default as the docker-compose mounts the .env_inner_rest file to the root
-// dotenv.config({ path: '../.env_inner_rest' });
 dotenv.config();
 
 const dbHost = process.env.MYSQL_CONTAINER_HOST;
@@ -16,7 +12,6 @@ export default {
     client: 'mysql2',
     connection: {
       host: dbHost,
-      port: dbPort,
       database: dbName,
       user: dbUser,
       password: dbPassword,

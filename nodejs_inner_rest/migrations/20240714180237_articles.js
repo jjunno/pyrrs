@@ -11,8 +11,8 @@ export const up = function (knex) {
     table.string('description', 255).notNullable();
     table.string('category', 255).notNullable();
     table.string('url', 255).notNullable();
-    table.string('image_url', 255).nullable();
-    table.datetime('date').notNullable();
+    table.boolean('words_processed').defaultTo(false);
+    table.boolean('category_processed').defaultTo(false);
 
     table.timestamps(true, true, true);
   });
