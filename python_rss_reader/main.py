@@ -35,13 +35,14 @@ def main():
   print(feed.feed['title'])
   for post in feed.entries:
     # print(post['title'])
-    item = feed_item.FeedItem(post)
-  
+    item = feed_item.FeedItem(feed.feed.title, post)
+    item.post_to_inner_rest()
+    # print(post.keys())
   return None
 
 if __name__ == "__main__":
-  main()
+  # main()
   # return None
-  # while True:
-  #   main()
-  #   time.sleep(MAIN_INTERVAL_SECONDS)
+  while True:
+    main()
+    time.sleep(900)

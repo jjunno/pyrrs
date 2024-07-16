@@ -1,5 +1,5 @@
 import express from 'express';
-
+import bodyParser from 'body-parser';
 import routes from './routes.js';
 
 import dotenv from 'dotenv';
@@ -8,6 +8,7 @@ dotenv.config();
 const PORT = 3000;
 
 const app = express();
+app.use(bodyParser.json());
 
 app.use('/innerapi', routes);
 

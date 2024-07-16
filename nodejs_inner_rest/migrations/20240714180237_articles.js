@@ -11,7 +11,10 @@ export const up = function (knex) {
     table.string('description', 255).notNullable();
     table.string('category', 255).notNullable();
     table.string('url', 255).notNullable();
-    table.string('image_url', 255).notNullable();
+    table.string('image_url', 255).nullable();
+    table.datetime('date').notNullable();
+
+    table.timestamps(true, true, true);
   });
 };
 
