@@ -167,4 +167,8 @@ nodejs_inner_rest/node_modules
 #
 # mysql_data
 #
-mysql_data/*
+mysql_data*
+
+.env*
+
+container_secret*

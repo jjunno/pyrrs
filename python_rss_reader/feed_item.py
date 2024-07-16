@@ -67,12 +67,15 @@ class FeedItem:
       # The format '%a, %d %b %Y %H:%M:%S %z' corresponds to the original format of the string
       # '%a' - Abbreviated weekday name, '%d' - Day of the month, '%b' - Abbreviated month name
       # '%Y' - Year with century, '%H:%M:%S' - Hour, minute, and second, '%z' - UTC offset
-      parsed_date = datetime.strptime(self.post['published'], "%a, %d %b %Y %H:%M:%S %z")
-      
-      # Step 2: Format the parsed date to the desired format 'YYYY-mm-dd H:I:S'
-      # Note: There's a small correction in the format specifier for minutes and seconds. It should be '%M' for minutes and '%S' for seconds.
-      formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
-      self.origin_date = formatted_date
+      try:
+        parsed_date = datetime.strptime(self.post['published'], "%a, %d %b %Y %H:%M:%S %z")
+        
+        # Step 2: Format the parsed date to the desired format 'YYYY-mm-dd H:I:S'
+        # Note: There's a small correction in the format specifier for minutes and seconds. It should be '%M' for minutes and '%S' for seconds.
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.origin_date = formatted_date
+      except:
+        self.origin_date = None
     print(f"Date: {self.origin_date}")
 
   def post_to_inner_rest(self):

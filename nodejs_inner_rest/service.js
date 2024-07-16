@@ -28,8 +28,12 @@ export async function create(req, res) {
       return res.status(400).json({ message: 'missing: url' });
     }
 
+    let date = null;
     if (!req.body.date) {
-      return res.status(400).json({ message: 'missing: date' });
+      date = knex.fn.now();
+      // return res.status(400).json({ message: 'missing: date' });
+    } else {
+      date = req.body.date;
     }
 
     const exists = await knex('articles')
@@ -48,7 +52,7 @@ export async function create(req, res) {
       category: req.body.category.substring(0, 255),
       url: req.body.url,
       image_url: req.body.image_url,
-      date: req.body.date,
+      date: date,
     });
     return res.status(201).send();
   } catch (e) {

@@ -45,4 +45,4 @@ if __name__ == "__main__":
   # return None
   while True:
     main()
-    time.sleep(900)
+    time.sleep(MAIN_INTERVAL_SECONDS)

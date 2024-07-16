@@ -1,6 +1,9 @@
 // Update with your config settings.
 import dotenv from 'dotenv';
-dotenv.config({ path: '../.env' });
+
+// Use path when developing. Otherwise use default as the docker-compose mounts the .env_inner_rest file to the root
+// dotenv.config({ path: '../.env_inner_rest' });
+dotenv.config();
 
 const dbHost = process.env.MYSQL_CONTAINER_HOST;
 const dbPort = process.env.MYSQL_CONTAINER_PORT;

@@ -1,15 +1,84 @@
 services:
-  db:
-    image: mysql:latest
-    container_name: mysql_container
+  mysql:
+    env_file: '.env_mysql'
+    build:
+      context: .
+      dockerfile: mysql.Dockerfile
+    container_name: mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_CONTAINER_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_CONTAINER_DATABASE}
-      MYSQL_USER: ${MYSQL_CONTAINER_USER}
-      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
-      # MYSQL_INITDB_SKIP_TZINFO: '1'
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: rss_reader_db
+      MYSQL_USER: rss_reader_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
     ports:
-      - '${MYSQL_CONTAINER_PORT}:3306'
+      - '3306:3306'
     volumes:
-      - ./mysql_data:/var/lib/mysql
-      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql_data:/var/lib/mysql:rw
+    networks:
+      - pyrrs_network
+    secrets:
+      - db_password
+      - db_root_password
+
+  inner_rest:
+    build:
+      context: .
+      dockerfile: inner_rest.Dockerfile
+    container_name: inner_rest
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    volumes:
+      - ./.env_inner_rest/:/app/.env/
+    networks:
+      - pyrrs_network
+    logging:
+      options:
+        max-size: '5m'
+        max-file: '10'
+
+  reader_yle:
+    build:
+      context: .
+      dockerfile: reader.Dockerfile
+    container_name: reader_yle
+    depends_on:
+      - inner_rest
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/storage
+      - ./.env_yle:/app/.env
+    logging:
+      options:
+        max-size: '5m'
+        max-file: '10'
+    networks:
+      - pyrrs_network
+
+  reader_is:
+    build:
+      context: .
+      dockerfile: reader.Dockerfile
+    container_name: reader_is
+    depends_on:
+      - inner_rest
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/storage
+      - ./.env_is:/app/.env
+    logging:
+      options:
+        max-size: '5m'
+        max-file: '10'
+    networks:
+      - pyrrs_network
+
+networks:
+  pyrrs_network:
+
+secrets:
+  db_password:
+    file: container_secret_mysql_password.txt
+  db_root_password:
+    file: container_secret_mysql_root_password.txt
