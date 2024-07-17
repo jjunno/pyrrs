@@ -36,10 +36,11 @@ export async function create(req, res) {
     }
 
     const exists = await knex('articles')
-      .where('origin_id', req.body.originId)
+      .where('originId', req.body.originId)
       .first();
 
     if (exists) {
+      processWordHits(req.body.originId, req.body.title);
       return res
         .status(409)
         .json({ message: `Article ${req.body.originId} already exists` });
@@ -47,8 +48,8 @@ export async function create(req, res) {
 
     console.log(`Insert article ${req.body.originId}`);
     await knex('articles').insert({
-      origin_id: req.body.originId.substring(0, 128),
-      origin_name: req.body.originName.substring(0, 64),
+      originId: req.body.originId.substring(0, 128),
+      originName: req.body.originName.substring(0, 64),
       title: req.body.title.substring(0, 255),
       description: req.body.description.substring(0, 255),
       category: req.body.category.substring(0, 255).toLowerCase(),
@@ -63,46 +64,76 @@ export async function create(req, res) {
     return res.status(500).send();
   }
 }
-
+/**
+ * Explode title and insert/update each word to database.
+ *
+ * @param {*} originId
+ * @param {string} title
+ */
 async function processWordHits(originId, title) {
   // Remove special characters and split title into words
   const cleaned = title.replace(/[^a-öA-Ö0-9\s]/g, '');
   const exploded = cleaned.split(' ');
 
-  // Count hits for each word
-  const hits = {};
-  exploded.forEach((word) => {
-    if (word.length > 1) {
-      word = word.substring(0, 64).toLowerCase();
-      if (hits[word]) {
-        hits[word] += 1;
-      } else {
-        hits[word] = 1;
-      }
+  // Iterate and insert/update to db
+  for (const key in exploded) {
+    const word = exploded[key].substring(0, 64).toLowerCase();
+    if (word.length < 2) {
+      continue;
     }
-  });
-
-  // Insert hits into database
-  const rows = [];
-  for (const word in hits) {
-    // console.log(`Insert word ${word} ${hits[word]}`);
     const exists = await knex('word_hits').where('word', word).first();
 
     if (exists) {
-      console.log(`Update word ${word} with ${hits[word]}`);
-      await knex('word_hits')
-        .where('word', word)
-        .update({
-          hits: knex.raw('hits + 1'),
-          updatedAt: knex.fn.now(),
-        });
+      updateWordToDatabase(word);
     } else {
-      console.log(`Insert word ${word} with ${hits[word]}`);
-      await knex('word_hits').insert({
-        word: word.substring(0, 64),
-        hits: hits[word],
-      });
+      console.log(`Insert word ${word}`);
+      try {
+        insertWordToDatabase(word);
+      } catch (e) {
+        /**
+         * The error is most likely duplicate entry because processWordHits is not waited. Just rerun the update.
+         */
+        updateWordToDatabase(word);
+        // console.error(e);
+      }
     }
   }
-  // await knex('word_hits').insert(rows);
+  await knex('articles').where('originId', originId).update({
+    wordsProcessed: true,
+    updatedAt: knex.fn.now(),
+  });
+}
+
+/**
+ * Insert new word to db.
+ * @param {*} word
+ */
+async function insertWordToDatabase(word) {
+  try {
+    console.log(`Insert word ${word}`);
+    await knex('word_hits').insert({
+      word: word.substring(0, 64),
+      hits: 1,
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Update word hits to db.
+ * @param {*} word
+ */
+async function updateWordToDatabase(word) {
+  try {
+    console.log(`Update word ${word}`);
+    await knex('word_hits')
+      .where('word', word)
+      .update({
+        hits: knex.raw('hits + 1'),
+        updatedAt: knex.fn.now(),
+      });
+  } catch (e) {
+    console.error(e);
+  }
 }

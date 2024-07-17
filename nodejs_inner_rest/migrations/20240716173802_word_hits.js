@@ -5,8 +5,8 @@
 export const up = function (knex) {
   return knex.schema.createTable('word_hits', function (table) {
     table.increments('id');
-    table.string('word', 64).notNullable().unique();
-    table.integer('hits').notNullable().defaultTo(0);
+    table.string('word', 64).notNullable().unique().index();
+    table.integer('hits').notNullable().defaultTo(1);
 
     table.timestamps(true, true, true);
   });
