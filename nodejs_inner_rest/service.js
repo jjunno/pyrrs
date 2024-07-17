@@ -39,14 +39,14 @@ export async function create(req, res) {
       .where('originId', req.body.originId)
       .first();
 
-    processWordHits(req.body.originId, req.body.title);
-    processCategoryHits(req.body.originId, req.body.category);
-
     if (exists) {
       return res
         .status(409)
         .json({ message: `Article ${req.body.originId} already exists` });
     }
+
+    processWordHits(req.body.originId, req.body.title);
+    processCategoryHits(req.body.originId, req.body.category);
 
     console.log(`Insert article ${req.body.originId}`);
     await knex('articles').insert({
