@@ -86,7 +86,6 @@ async function processWordHits(originId, title) {
     if (exists) {
       updateWordToDatabase(word);
     } else {
-      console.log(`Insert word ${word}`);
       try {
         insertWordToDatabase(word);
       } catch (e) {
