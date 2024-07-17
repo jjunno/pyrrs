@@ -74,6 +74,24 @@ services:
     networks:
       - pyrrs_network
 
+  reader_mtv:
+    build:
+      context: .
+      dockerfile: reader.Dockerfile
+    container_name: reader_mtv
+    depends_on:
+      - inner_rest
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/storage
+      - ./.env_mtv:/app/.env
+    logging:
+      options:
+        max-size: '5m'
+        max-file: '10'
+    networks:
+      - pyrrs_network
+
 networks:
   pyrrs_network:
 
