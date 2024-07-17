@@ -62,8 +62,8 @@ class FeedItem:
     print(f"Posting {self.origin_id} to inner REST API...")
     try:
       response = requests.post(self.inner_rest_url, json={
-        'origin_id': self.origin_id,
-        'origin_name': self.origin_name,
+        'originId': self.origin_id,
+        'originName': self.origin_name,
         'title': self.title,
         'category': self.category,
         'description': self.description,
