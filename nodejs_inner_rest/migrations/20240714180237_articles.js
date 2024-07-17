@@ -9,7 +9,7 @@ export const up = function (knex) {
     table.string('originName', 64).notNullable();
     table.string('title', 255).notNullable();
     table.string('description', 255).notNullable();
-    table.string('category', 255).notNullable();
+    table.string('category', 32).notNullable();
     table.string('url', 255).notNullable();
     table.boolean('wordsProcessed').defaultTo(false);
     table.boolean('categoryProcessed').defaultTo(false);

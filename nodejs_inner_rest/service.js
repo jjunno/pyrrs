@@ -39,8 +39,10 @@ export async function create(req, res) {
       .where('originId', req.body.originId)
       .first();
 
+    processWordHits(req.body.originId, req.body.title);
+    processCategoryHits(req.body.originId, req.body.category);
+
     if (exists) {
-      processWordHits(req.body.originId, req.body.title);
       return res
         .status(409)
         .json({ message: `Article ${req.body.originId} already exists` });
@@ -52,10 +54,9 @@ export async function create(req, res) {
       originName: req.body.originName.substring(0, 64),
       title: req.body.title.substring(0, 255),
       description: req.body.description.substring(0, 255),
-      category: req.body.category.substring(0, 255).toLowerCase(),
+      category: req.body.category.substring(0, 32).toLowerCase(),
       url: req.body.url,
     });
-    processWordHits(req.body.originId, req.body.title);
     return res
       .status(201)
       .json({ message: `Article ${req.body.origin_id} created` });
@@ -64,6 +65,7 @@ export async function create(req, res) {
     return res.status(500).send();
   }
 }
+
 /**
  * Explode title and insert/update each word to database.
  *
@@ -101,6 +103,36 @@ async function processWordHits(originId, title) {
 }
 
 /**
+ * Insert/update category to database.
+ *
+ * @param {*} originId
+ * @param {string} category
+ */
+async function processCategoryHits(originId, category) {
+  if (category.length < 2) {
+    return;
+  }
+
+  const c = category.substring(0, 64).toLowerCase();
+  const exists = await knex('category_hits').where('category', c).first();
+
+  if (exists) {
+    updateCategoryToDatabase(c);
+  } else {
+    try {
+      insertCategoryToDatabase(c);
+    } catch (e) {
+      /**
+       * The error is most likely duplicate entry because processCategoryHits is not waited. Just rerun the update.
+       */
+      updateCategoryToDatabase(c);
+      // console.error(e);
+    }
+  }
+  updateArticleCategoryProcessedStatus(originId);
+}
+
+/**
  * Insert new word to db.
  * @param {*} word
  */
@@ -135,6 +167,40 @@ async function updateWordToDatabase(word) {
 }
 
 /**
+ * Insert new category to db.
+ * @param {*} category
+ */
+async function insertCategoryToDatabase(category) {
+  try {
+    console.log(`Insert category ${category}`);
+    await knex('category_hits').insert({
+      category: category.substring(0, 32),
+      hits: 1,
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Update category hits to db.
+ * @param {*} category
+ */
+async function updateCategoryToDatabase(category) {
+  try {
+    console.log(`Update category ${category}`);
+    await knex('category_hits')
+      .where('category', category)
+      .update({
+        hits: knex.raw('hits + 1'),
+        updatedAt: knex.fn.now(),
+      });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
  * Update article wordProcessed status to true.
  * @param {*} originId
  */
@@ -142,6 +208,21 @@ async function updateArticleWordProcessedStatus(originId) {
   try {
     await knex('articles').where('originId', originId).update({
       wordsProcessed: true,
+      updatedAt: knex.fn.now(),
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Update article categoryProcessed status to true.
+ * @param {*} originId
+ */
+async function updateArticleCategoryProcessedStatus(originId) {
+  try {
+    await knex('articles').where('originId', originId).update({
+      categoryProcessed: true,
       updatedAt: knex.fn.now(),
     });
   } catch (e) {
