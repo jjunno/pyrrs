@@ -97,10 +97,7 @@ async function processWordHits(originId, title) {
       }
     }
   }
-  await knex('articles').where('originId', originId).update({
-    wordsProcessed: true,
-    updatedAt: knex.fn.now(),
-  });
+  updateArticleWordProcessedStatus(originId);
 }
 
 /**
@@ -132,6 +129,21 @@ async function updateWordToDatabase(word) {
         hits: knex.raw('hits + 1'),
         updatedAt: knex.fn.now(),
       });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Update article wordProcessed status to true.
+ * @param {*} originId
+ */
+async function updateArticleWordProcessedStatus(originId) {
+  try {
+    await knex('articles').where('originId', originId).update({
+      wordsProcessed: true,
+      updatedAt: knex.fn.now(),
+    });
   } catch (e) {
     console.error(e);
   }
