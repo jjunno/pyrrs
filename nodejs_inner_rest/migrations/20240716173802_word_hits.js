@@ -7,6 +7,7 @@ export const up = function (knex) {
     table.increments('id');
     table.string('word', 64).notNullable().unique().index();
     table.integer('hits').notNullable().defaultTo(1);
+    table.boolean('ignore').defaultTo(false);
 
     table.timestamps(true, true, true);
   });

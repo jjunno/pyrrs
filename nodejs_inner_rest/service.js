@@ -156,7 +156,7 @@ async function updateWordToDatabase(word) {
   try {
     console.log(`Update word ${word}`);
     await knex('word_hits')
-      .where('word', word)
+      .where({ word: word, ignore: false })
       .update({
         hits: knex.raw('hits + 1'),
         updatedAt: knex.fn.now(),
