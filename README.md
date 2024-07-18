@@ -1,6 +1,6 @@
 # Perustiedot
 
-Vaihteeksi no-brainer Python/Node/Vue/Nginx/MySQL/Docker "microservice"hässäkkä, joka lukee yleisimpiä kotimaisia RSS uutisfeedejä, tallentaa uusimmat uutiset kantaan eniten käytettyine sanoineen ja kategorioineen. Jokainen uutislähde on oma konttinsa.
+Vaihteeksi no-brainer Python/Node/Vue/Nginx/MySQL/Docker, ikään kuin, microservicehässäkkä, joka lukee yleisimpiä kotimaisia RSS uutisfeedejä, tallentaa uusimmat uutiset kantaan eniten käytettyine sanoineen ja kategorioineen. Jokainen uutislähde on oma konttinsa.
 
 Ekstrasimppeli Vue frontti, jossa canvakseen räjäytetään 50 eniten käytettyä sanaa.
 
@@ -9,6 +9,8 @@ Aika alkoi loppumaan, joten tehnyt frontille / public restille sen kummempaa. Mu
 # python_rrs_reader
 
 Simppeli palikka, joka lukee `feedparser`illa RRS feedin. Iteroi uutiset ja lähettää ne halutussa muodossa nodejs_inner_restille. Rivit lähetetään yksitellen, on oletettu että RRS feedin lukuväli on esim. 15min jonka aikana ei kovin montaa uutista yhdestä lähteestä tule.
+
+Jokainen uutislähde on oma konttinsa ja jokaiselle kontille on oma .env, jossa lähde ja hakuväli (sekunnit) määritelty.
 
 ```
 python3 -m venv venv
@@ -30,9 +32,9 @@ python3 main.py
 deactivate
 ```
 
-# nodejs_inner_rest
+# nodejs_inner_rest (inner_rest)
 
-Ottaa vastaan python_rss_readerilta POST sanomaa tallentaen uutisrivit MySQL kantaan `knex`iä käyttäen. Asynkkinä myös päivittää uutisotsikoista löydetyt sanat ja kategoriat kantaan.
+Ottaa vastaan python_rss_reader konteilta POST sanomaa tallentaen uutisrivit MySQL kantaan `knex`iä käyttäen. Asynkkinä myös päivittää uutisotsikoista löydetyt sanat ja kategoriat kantaan.
 
 Hallitsee myös tietokantamigraatiot.
 
@@ -48,11 +50,11 @@ npm run dev
 npx knex migrate:latest
 ```
 
-# nodejs_public_rest
+# nodejs_public_rest (public_rest)
 
 Ottaa vastaan GETiä, tarkoitettu lähinnä fronttia varten. Palauttaa tietokannasta 50 eniten uutisotsikoista ilmennyttä sanaa (tietokantariviä).
 
-Nginx ohjannee sanomat /apista tälle kontille porttiin 3000.
+` Nginx` ohjannee sanomat /apista tälle kontille porttiin 3000.
 
 ```
 npm install
@@ -60,6 +62,38 @@ npm install
 
 ```
 npm run dev
+```
+
+## .env_inner_rest
+
+inner_rest konttia varten.
+
+```
+touch .env_inner_rest
+```
+
+```
+MYSQL_CONTAINER_HOST=mysql
+MYSQL_CONTAINER_PORT=3306
+MYSQL_CONTAINER_DATABASE=rss_reader_db
+MYSQL_CONTAINER_USER=rss_reader_user
+MYSQL_CONTAINER_PASSWORD=foobar
+```
+
+## .env_public_rest
+
+public_rest konttia varten.
+
+```
+touch .env_public_rest
+```
+
+```
+MYSQL_CONTAINER_HOST=mysql
+MYSQL_CONTAINER_PORT=3306
+MYSQL_CONTAINER_DATABASE=rss_reader_db
+MYSQL_CONTAINER_USER=rss_reader_user
+MYSQL_CONTAINER_PASSWORD=foobar
 ```
 
 ## .env_is
