@@ -64,6 +64,20 @@ npm install
 npm run dev
 ```
 
+## vue
+
+Kehittäessä viimeisimmällä Vue 3 & Vuetify 3 versiolla pystytetty. Tarjoaa yksinkertaisen näkymän, jossa 50 uusinta sanaa räjäytetty canvakselle.
+
+Katso myös vue/.env
+
+```
+npm install
+```
+
+```
+npm run dev
+```
+
 ## .env_inner_rest
 
 inner_rest konttia varten.
