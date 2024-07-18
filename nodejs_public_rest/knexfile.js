@@ -1,0 +1,27 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+const dbHost = process.env.MYSQL_CONTAINER_HOST;
+const dbPort = process.env.MYSQL_CONTAINER_PORT;
+const dbName = process.env.MYSQL_CONTAINER_DATABASE;
+const dbUser = process.env.MYSQL_CONTAINER_USER;
+const dbPassword = process.env.MYSQL_CONTAINER_PASSWORD;
+
+export default {
+  development: {
+    client: 'mysql2',
+    connection: {
+      host: dbHost,
+      database: dbName,
+      user: dbUser,
+      password: dbPassword,
+    },
+    pool: {
+      min: 2,
+      max: 10,
+    },
+    migrations: {
+      tableName: 'public_knex_migrations',
+    },
+  },
+};
