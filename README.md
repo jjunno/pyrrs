@@ -6,6 +6,8 @@ Ekstrasimppeli Vue frontti, jossa canvakseen räjäytetään 50 eniten käytetty
 
 Aika alkoi loppumaan, joten tehnyt frontille / public restille sen kummempaa. Muutenkin jäi kesken, mutta ihan saa kyllä näinkin toimivana rullaamaan taustalle.
 
+Näin jälkikäteen huomasin, että olen jopa typonnut projektin nimen. Olkoon se siis lyhenne Python Reader REST Systemistä!
+
 # python_rrs_reader
 
 Simppeli palikka, joka lukee `feedparser`illa RRS feedin. Iteroi uutiset ja lähettää ne halutussa muodossa nodejs_inner_restille. Rivit lähetetään yksitellen, on oletettu että RRS feedin lukuväli on esim. 15min jonka aikana ei kovin montaa uutista yhdestä lähteestä tule.
@@ -48,6 +50,10 @@ npm run dev
 
 ```
 npx knex migrate:latest
+```
+
+```
+docker exec -it -w /app inner_rest npx knex migrate:latest
 ```
 
 # nodejs_public_rest (public_rest)
