@@ -13,5 +13,5 @@ COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 # COPY ./certbot/www/ /var/www/certbot/
 
 COPY --from=build-stage /app/dist /app/
-EXPOSE 80 443
+EXPOSE 80 443 8080
 CMD ["nginx", "-g", "daemon off;"]
